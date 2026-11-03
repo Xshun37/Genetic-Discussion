@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>染色质三维结构 · 交互演示</title>
+<style>
+:root{color-scheme:light;--bg:#f4f2ec;--paper:#fff;--ink:#27343a;--muted:#65737b;--line:#d9dedd;--accent:#a43e31}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:960px;margin:0 auto;padding:64px 24px 72px}
+h1{font-size:clamp(26px,4vw,38px);line-height:1.3;margin:0 0 10px;font-weight:650;letter-spacing:-.01em}
+.lead{color:var(--muted);margin:0 0 40px;max-width:62ch}
+.cards{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+a.card{display:flex;flex-direction:column;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:26px 24px;text-decoration:none;color:inherit;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+a.card:hover,a.card:focus-visible{transform:translateY(-2px);border-color:#b9c4c7;box-shadow:0 8px 24px rgba(39,52,58,.10)}
+a.card:focus-visible{outline:3px solid #7b9dbc;outline-offset:3px}
+.tag{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.card h2{font-size:19px;margin:0;font-weight:650}
+.card p{margin:0;color:var(--muted);font-size:14.5px}
+.go{margin-top:6px;font-size:14px;font-weight:600;color:#315d8a}
+footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer a{color:#315d8a}
+@media(max-width:480px){main{padding:44px 18px 56px}}
+</style>
+</head>
+<body>
+<main>
+  <h1>染色质三维结构 · 交互演示</h1>
+  <p class="lead">Topic 4 Genome 课堂演示。两个页面都是单文件 HTML，Canvas 实时绘制，不依赖网络库，可直接在浏览器打开。</p>
+
+  <div class="cards">
+    <a class="card" href="HiC_Demo.html">
+      <span class="tag">01 · Hi-C</span>
+      <h2>一张图逐级放大</h2>
+      <p>GM12878 · chr21 · hg38。从 31 Mb 的 A/B compartment，到 6 Mb 的 TAD，再到 2 Mb 内的局部 loop 候选；可调 bin、reads 深度与归一化方式，并导出 PNG。</p>
+      <span class="go">打开演示 →</span>
+    </a>
+    <a class="card" href="Loop_Extrusion.html">
+      <span class="tag">02 · Loop Extrusion</span>
+      <h2>环挤压模型</h2>
+      <p>黏连蛋白沿染色质挤出环，CTCF 位点定向阻断。可调挤出速度、CTCF 占位与朝向，观察接触图谱如何从均匀背景中长出条纹与角点。</p>
+      <span class="go">打开演示 →</span>
+    </a>
+  </div>
+
+  <footer>
+    Hi-C 数据：<a href="https://www.encodeproject.org/experiments/ENCSR822UMS/" target="_blank" rel="noreferrer">ENCODE ENCSR822UMS</a>（GM12878 intact Hi-C）。页面为教学用途。<br>
+    提示：01 页面内嵌约 40 MB 数据，首次加载需要几秒；02 页面不足 30 KB。
+  </footer>
+</main>
+</body>
+</html>

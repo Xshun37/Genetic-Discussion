@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>单向环挤出 · Loop → Stripe → Dot</title>
+<style>
+:root{color-scheme:light;--bg:#f5f5f1;--paper:#fff;--ink:#27343c;--muted:#657680;--line:#d7dfdf;--blue:#316e9b;--teal:#267f86;--orange:#ba6638;--red:#b13639}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 "Segoe UI","Microsoft YaHei",sans-serif}main{max-width:1390px;margin:auto;padding:24px 30px}header{display:flex;align-items:center;justify-content:space-between;gap:20px}h1{font-size:27px;margin:0 0 4px;font-weight:650}.sub{color:var(--muted);font-size:14px}.modeltag{padding:5px 12px;border:1px solid var(--line);border-radius:30px;color:var(--muted);white-space:nowrap;font-size:12px}.stages{display:flex;gap:11px;align-items:center;flex-wrap:wrap;margin:21px 0 18px}.stage{color:var(--muted);border-bottom:3px solid transparent;padding:4px 2px}.stage.active{border-color:var(--teal);color:var(--ink);font-weight:600}.arrow{color:#829098}.workspace{display:grid;grid-template-columns:1fr 1.06fr;gap:27px;align-items:start}.panel{min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:17px 18px}.panelhead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:7px}h2{margin:0;font-size:17px;font-weight:600}.small{font-size:12px;color:var(--muted)}canvas{display:block;width:100%;height:auto}#chromatin{height:270px}#genome{height:105px;touch-action:none;cursor:ew-resize}#matrix{aspect-ratio:1.06}#profile{height:87px}.key{display:flex;gap:15px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted);margin:5px 0 9px}.key span{display:flex;gap:5px;align-items:center}.swatch{display:inline-block;width:9px;height:9px;border-radius:50%}.fixed{background:var(--orange)}.moving{background:var(--blue)}.barrier{background:var(--teal)}.controls{border-top:1px solid var(--line);margin-top:8px;padding-top:13px}.sliderlabel{display:flex;justify-content:space-between;gap:10px;font-size:14px}b,output{font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:var(--blue);margin:12px 0 5px}.rangeends{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}button{font:inherit;font-size:13px;color:var(--ink);border:1px solid #bdc9ca;border-radius:5px;background:white;padding:7px 12px;cursor:pointer}button.primary{background:var(--ink);border-color:var(--ink);color:white}button:focus-visible,input:focus-visible{outline:3px solid #7a9eb7;outline-offset:3px}.viewtoggle{display:flex;gap:7px;align-items:center;font-size:13px;cursor:pointer;margin:8px 0}input[type=checkbox]{accent-color:var(--teal);width:16px;height:16px}.phase{margin-top:13px;padding:12px 13px;background:#edf3f3;border-radius:5px;min-height:94px}.phase strong{display:block;font-size:14px;margin-bottom:4px}.phase p{font-size:13px;color:#4c656d;margin:0}.readouts{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:9px 0;font-size:12px}.legend{display:flex;gap:8px;justify-content:center;align-items:center;font-size:11px;color:var(--muted);margin:5px 0}.gradient{height:10px;width:160px;background:linear-gradient(to right,#fff9f4,#f8c1a1,#e96c54,#b52d36,#5c1027);border-radius:2px}.footer{margin:16px 0 0;border-top:1px solid var(--line);padding-top:12px;color:var(--muted);font-size:12px}.footer a{color:var(--blue)}details{margin:8px 0}summary{cursor:pointer}.fineprint{font-size:11px;color:var(--muted);margin-top:8px}.warning{color:#985d26}#error{color:#a4292f;font-size:13px;min-height:22px}p{margin:0}.contactLabel{font-size:12px;color:var(--muted)}
+@media(max-width:950px){main{padding:18px}.workspace{gap:16px}.panel{padding:13px}h1{font-size:23px}.modeltag{display:none}#chromatin{height:245px}}
+.orientation{padding:11px 12px;background:#eef5f3;border:1px solid #d3e3de;border-radius:5px;margin:9px 0 14px}.motifs{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.motif{color:var(--teal);font-weight:650;white-space:nowrap}.motif b{font-size:23px;line-height:1;vertical-align:-2px;margin:0 5px}.orientation button{padding:4px 8px;font-size:12px}.orientation p{font-size:12px;color:#49656b;margin-top:6px}.orientation .fineprint{font-size:11px}.orientation button[aria-pressed=true]{background:#d7e9e3;border-color:#8fb5a9}
+@media(max-width:720px){.workspace{grid-template-columns:1fr}.stages{gap:7px;font-size:13px}.panel{padding:15px}main{padding:15px}h1{font-size:22px}.sub{font-size:13px}#chromatin{height:250px}}
+@media print{body{background:white}.actions,details,.viewtoggle,.fineprint{display:none}main{padding:5px}.workspace{grid-template-columns:1fr 1fr}.panel{border:0}.stages{margin:10px 0}}
+</style></head><body><main>
+<header><div><h1>单向环挤出：Loop → Stripe → Dot</h1><p class="sub">拖动移动端 B；固定端 A 不动。观察染色质折叠与接触矩阵如何对应。</p></div><span class="modeltag">机制示意 · 非真实 Hi-C 数据</span></header>
+<nav class="stages" aria-label="机制演示阶段"><span class="stage active" id="stageLoop">① Loop 逐渐扩大</span><span class="arrow">→</span><span class="stage" id="stageStripe">② 接触累积为 stripe</span><span class="arrow">→</span><span class="stage" id="stageDot">③ 末端停留形成 dot</span></nav>
+<div class="workspace">
+<section class="panel"><div class="panelhead"><h2>染色质构象</h2><span class="small" id="motionStatus">等待拖动</span></div>
+<canvas id="chromatin" role="img" aria-label="固定一端、另一端移动的单向环挤出示意"></canvas>
+<div class="key"><span><i class="swatch fixed"></i>固定端 A</span><span><i class="swatch moving"></i>移动端 B</span><span><i class="swatch barrier"></i>CTCF · 方向性屏障</span></div>
+<canvas id="genome" role="img" aria-label="线性基因组坐标；可直接拖动蓝色移动端 B"></canvas>
+<div class="controls">
+<div class="orientation"><div class="motifs"><span class="motif">CTCF-L <b>&gt;</b></span><span class="small">200 → 800 kb</span><span class="motif">CTCF-R <b id="rightMotif">&lt;</b></span><button id="flipCTCF" type="button" aria-pressed="false">翻转右端朝向</button></div><p id="orientationStatus">相向排列 &gt; … &lt;：右端阻挡，停留后形成 dot。</p><p class="fineprint">箭头表示线性 DNA 上的 motif 朝向；左端保持已锚定。切换朝向后从头对比。</p></div>
+<div class="sliderlabel"><label for="position">移动端 B：<b id="positionValue">210 kb</b></label><span>Loop 长度 <b id="loopValue">10 kb</b></span></div>
+<input type="range" id="position" min="21" max="80" value="21" step="1" aria-label="挤出进度：移动端 B 的基因组位置">
+<div class="rangeends"><span>A = 200 kb</span><span id="rangeEnd">CTCF-R = 800 kb · 阻挡</span></div>
+<div class="actions"><button id="play" class="primary" type="button">自动挤出</button><button id="reset" type="button">从头开始</button><button id="export" type="button">导出 PNG</button></div>
+<p class="fineprint">滑块用于选择演示进度；向左回看不表示挤出机器反向运行。</p>
+</div>
+<div class="phase" aria-live="polite"><strong id="phaseTitle">固定 A，向右移动 B</strong><p id="phaseBody">先拖动蓝色端点或滑块，让线性序列中更远的位置进入同一个 loop。</p></div>
+</section>
+<section class="panel"><div class="panelhead"><h2>接触矩阵</h2><span id="mapView" class="small">累计接触 · Hi-C 视角</span></div>
+<label class="viewtoggle"><input id="accumulate" type="checkbox" checked>累计不同挤出状态的接触</label>
+<canvas id="matrix" role="img" aria-label="显示固定锚点相关 stripe 和末端 dot 的对称接触矩阵"></canvas>
+<div class="readouts"><span>当前接触：<b id="pairValue">(200, 210) kb</b></span><span id="dwellValue">末端停留：0.0 s</span></div>
+<div class="legend"><span>低</span><span class="gradient"></span><span>高 · 相对接触富集</span></div>
+<canvas id="profile" role="img" aria-label="固定锚点 A 对不同位置的接触富集；末端会出现峰值"></canvas>
+<p class="small">矩阵上下两个信号互为对称，代表同一组接触；不是两个独立 loop。</p>
+</section></div>
+<div id="error" role="alert"></div>
+<footer class="footer"><strong>课堂要点：</strong>一个瞬时 loop 对应一对接触坐标；固定锚点与连续多个位置在不同状态下接触，累计后呈现 stripe。若移动端在某个位置停留，该接触对重复出现，会形成更强的 dot。
+<details><summary>模型假设与原论文</summary><p>这里采用“一端固定、另一端前进”的教学模型；累计图把多个细胞或多个挤出状态的接触富集叠加。不是一条 DNA 在单次实验中留下了可被 Hi-C 直接读取的运动轨迹。</p><p>左端 CTCF-L（&gt;）已锚定；右端 CTCF-R 为 &lt; 时，与左端相向，移动端在 800 kb 停留；翻转为 &gt; 后，在本演示中允许越过该位点，至 950 kb 演示边界结束，不增加停留 dot。CTCF 随其结合的 DNA 位点进入 loop，基因组坐标始终不变。Motif 箭头表示 DNA 序列朝向，不表示 CTCF 主动运动；挤出由 cohesin 复合体完成。</p><p>CTCF 的 N-terminal 一侧更有利于阻挡 cohesin。真实屏障具有方向偏好，且受占据率、DNA 张力等影响，并非绝对开关；这里用“阻挡／越过”突出机制，不代表每次相遇的必然结果。并非所有 loop 都依赖 CTCF。Stripe 不能单独证明真实 cohesin 只有一个方向的运动。形状、速度和接触强度没有拟合聚合物动力学。</p><p>参考：<a href="https://pubmed.ncbi.nlm.nih.gov/29706548/" target="_blank" rel="noreferrer">Vian et al., Cell 2018 — The Energetics and Physiological Impact of Cohesin Extrusion</a>；<a href="https://pubmed.ncbi.nlm.nih.gov/26499245/" target="_blank" rel="noreferrer">Sanborn et al., PNAS 2015 — Chromatin extrusion explains key features of loop and domain formation</a>；<a href="https://pubmed.ncbi.nlm.nih.gov/37076620/" target="_blank" rel="noreferrer">Davidson et al., Nature 2023 — CTCF is a DNA-tension-dependent barrier to cohesin-mediated loop extrusion</a>。</p></details></footer>
+</main><script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),N=100,A=20,STOP=80,END=95,BIN=10,HOLD=3,SPEED=7.5;
+const state={b:21,dwell:0,playing:false,holding:false,accumulate:true,rightOrientation:-1};
+const blocking=()=>state.rightOrientation===-1,limit=()=>blocking()?STOP:END;
+const atBarrier=()=>blocking()&&state.b>=STOP-.001;
+let raf=0,last=0,dragging=false,lastPhase='',matrixValues=null;
+const palette=[[255,249,244],[248,193,161],[233,108,84],[181,45,54],[92,16,39]];
+const dnaColor='#316e9b',fixedColor='#ba6638',movingColor='#316e9b',barrierColor='#267f86';
+function context(canvas,height){const w=Math.max(250,canvas.clientWidth),h=height||w/1.06,dpr=window.devicePixelRatio||1;canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);ctx.font='12px "Segoe UI","Microsoft YaHei",sans-serif';return {ctx,w,h};}
+function line(ctx,points,color,width=3){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.stroke();}
+function dot(ctx,x,y,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
+function arrow(ctx,x1,y1,x2,y2,color){line(ctx,[[x1,y1],[x2,y2]],color,1.8);const t=Math.atan2(y2-y1,x2-x1),s=7;line(ctx,[[x2-s*Math.cos(t-.5),y2-s*Math.sin(t-.5)],[x2,y2],[x2-s*Math.cos(t+.5),y2-s*Math.sin(t+.5)]],color,1.8);}
+// Motif arrow follows increasing genomic coordinates, not DNA flow direction.
+function motifArrow(ctx,x,y,direction,size=10){ctx.fillStyle=barrierColor;ctx.beginPath();ctx.moveTo(x+direction*size,y);ctx.lineTo(x-direction*size*.6,y-size*.7);ctx.lineTo(x-direction*size*.6,y+size*.7);ctx.closePath();ctx.fill();}
+function ctcfBadge(ctx,point,label,labelX,labelY){line(ctx,[point,[labelX,labelY+5]],'#77a59d',1);dot(ctx,...point,7,barrierColor);dot(ctx,...point,3,'#fff');ctx.fillStyle=barrierColor;ctx.textAlign='center';ctx.fillText(label,labelX,labelY);}
+function drawChromatin(){
+const canvas=$('chromatin'),{ctx,w,h}=context(canvas,canvas.clientHeight);
+// Keep the extrusion complex at the center. Trace the loop in the material
+// transport direction: B up the right arm, over the top, down toward A.
+const cx=w*.50,ax=cx-13,bx=cx+13,base=h-50,q=(state.b-A)/(END-A);
+const loopWidth=12+(w*.31-12)*Math.pow(q,.75),loopHeight=10+(h-95)*Math.sqrt(q);
+const p0=[bx,base],p1=[cx+loopWidth*.42,base-loopHeight*.95],p2=[cx-loopWidth*.82,base-loopHeight*.52],p3=[ax,base];
+const segments=[
+ [p0,[bx+loopWidth*.12,base-loopHeight*.28],[cx+loopWidth*1.15,base-loopHeight*.67],p1],
+ [p1,[cx+loopWidth*.02,base-loopHeight*1.12],[cx-loopWidth*.98,base-loopHeight*.86],p2],
+ [p2,[cx-loopWidth*.70,base-loopHeight*.25],[ax-loopWidth*.10,base-loopHeight*.10],p3]
+];
+ctx.fillStyle='#657680';ctx.textAlign='left';ctx.fillText('A 的基因组锚点不变',8,17);ctx.textAlign='right';ctx.fillText(atBarrier()?'B 已停靠 CTCF':state.b>STOP?'已越过反向 CTCF':'B 侧上送 · A 侧回落',w-8,17);
+ctx.strokeStyle=dnaColor;ctx.lineWidth=3.8;ctx.lineCap='round';
+ctx.beginPath();ctx.moveTo(18,base+3);ctx.bezierCurveTo(30,base+3,ax-28,base+3,ax,base);ctx.stroke();
+ctx.beginPath();ctx.moveTo(...p0);for(const s of segments)ctx.bezierCurveTo(...s[1],...s[2],...s[3]);ctx.stroke();
+// Material markers keep their genomic identity. On the free flank, every
+// marker shifts toward B; after capture it travels along the loop contour.
+const materialScale=(w-23-bx)/(N-(A+1));
+function tailPoint(site){const d=site-state.b;return [bx+d*materialScale,base+Math.sin(d*.18)*4*Math.min(1,d/9)];}
+const tailEnd=tailPoint(N);ctx.beginPath();ctx.moveTo(bx,base);for(let site=state.b+.3;site<N;site+=.35)ctx.lineTo(...tailPoint(site));ctx.lineTo(...tailEnd);ctx.stroke();
+const path=[],distances=[];let total=0;
+for(const s of segments){for(let k=0;k<=55;k++){const t=k/55,u=1-t,p=[0,1].map(d=>u*u*u*s[0][d]+3*u*u*t*s[1][d]+3*u*t*t*s[2][d]+t*t*t*s[3][d]);if(path.length)total+=Math.hypot(p[0]-path[path.length-1][0],p[1]-path[path.length-1][1]);path.push(p);distances.push(total);}}
+function pointAt(fraction){const target=Math.max(0,Math.min(1,fraction))*total;let i=1;while(i<distances.length-1&&distances[i]<target)i++;const f=(target-distances[i-1])/Math.max(1e-9,distances[i]-distances[i-1]);return [0,1].map(d=>path[i-1][d]*(1-f)+path[i][d]*f);}
+function loopPoint(site){return pointAt((state.b-site)/(state.b-A));}
+const material=[];
+for(let site=30;site<=N;site+=10){const inLoop=site<=state.b,p=inLoop?loopPoint(site):tailPoint(site);material.push({site,x:p[0],y:p[1],inLoop});dot(ctx,p[0],p[1],site===STOP?4.3:2.8,site===STOP?barrierColor:dnaColor);if(site!==STOP){dot(ctx,p[0],p[1],1.1,'#fff');}}
+// Direction arrows follow the loop contour, rather than implying that both
+// arms inflate symmetrically. A remains the anchored genomic endpoint.
+const bFlow=[pointAt(.035),pointAt(.20)],aFlow=[pointAt(.79),pointAt(.95)];
+if(q>.12&&state.b<limit()){
+ arrow(ctx,bFlow[0][0]+11,bFlow[0][1],bFlow[1][0]+11,bFlow[1][1],movingColor);
+ arrow(ctx,aFlow[0][0]-11,aFlow[0][1],aFlow[1][0]-11,aFlow[1][1],fixedColor);
+ ctx.fillStyle=movingColor;ctx.textAlign='left';ctx.fillText(w<380?'↑ B':'B 侧向上送入',Math.max(bFlow[0][0],bFlow[1][0])+18,(bFlow[0][1]+bFlow[1][1])/2);
+ ctx.fillStyle=fixedColor;ctx.textAlign='right';ctx.fillText(w<380?'A ↓':'A 侧向下回落',Math.min(aFlow[0][0],aFlow[1][0])-18,(aFlow[0][1]+aFlow[1][1])/2);
+}
+// CTCF stays on its DNA site, including after read-through into the loop.
+const barrier=state.b>=STOP?loopPoint(STOP):tailPoint(STOP);
+ctx.strokeStyle='#8b6d93';ctx.lineWidth=9;ctx.beginPath();ctx.ellipse(cx,base+1,30,15,0,0,2*Math.PI);ctx.stroke();ctx.strokeStyle='#b39db9';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(cx,base+1,30,15,0,0,2*Math.PI);ctx.stroke();
+dot(ctx,ax,base,6,fixedColor);dot(ctx,bx,base,6,movingColor);
+ctx.fillStyle=fixedColor;ctx.textAlign='right';ctx.fillText('A 锚点',ax-25,base+20);ctx.fillStyle=movingColor;ctx.textAlign='left';ctx.fillText('B 入口',bx+24,base+18);
+ctcfBadge(ctx,[ax-6,base-2],'CTCF-L',ax-57,base-28);
+const labelX=Math.max(bx+40,Math.min(w-29,barrier[0]+20));
+ctcfBadge(ctx,barrier,'CTCF-R',labelX,barrier[1]-27);
+ctx.fillStyle='#657680';ctx.textAlign='center';ctx.fillText('cohesin 复合体 · 固定在中央',cx,base+40);
+if(q>.18){const lx=cx+loopWidth*.03,ly=base-loopHeight*.58;ctx.fillStyle='#27343c';ctx.font='15px "Segoe UI","Microsoft YaHei",sans-serif';ctx.fillText('Loop',lx,ly);ctx.font='12px "Segoe UI","Microsoft YaHei",sans-serif';ctx.fillText((Math.round(state.b)-A)*BIN+' kb',lx,ly+20);}
+if(state.b<limit()&&tailEnd[0]>bx+95)arrow(ctx,tailEnd[0]-3,base+26,bx+65,base+26,movingColor);
+canvas._geometry={center:cx,width:w,a:{x:ax,y:base},b:{x:bx,y:base},tailEnd:tailEnd[0],loopWidth,material,bFlow,aFlow,ctcfRight:{x:barrier[0],y:barrier[1],site:STOP,inLoop:state.b>=STOP,orientation:state.rightOrientation}};
+}
+function drawGenome(){const canvas=$('genome'),{ctx,w}=context(canvas,105),l=23,r=w-23,y=53,x=p=>l+p/N*(r-l),bx=x(state.b),ax=x(A),end=x(STOP);canvas._scale={l,r,y,w};ctx.fillStyle='#657680';ctx.textAlign='center';ctx.fillText('线性坐标',w/2,13);line(ctx,[[l,y],[r,y]],'#c2cccf',3);line(ctx,[[ax,y],[bx,y]],'#82abbf',6);
+// Colored span denotes genomic DNA currently inside the extruded loop.
+ctx.fillStyle='#ddeaf0';ctx.fillRect(ax,y+7,Math.max(0,bx-ax),10);
+motifArrow(ctx,ax,y-22,1,9);motifArrow(ctx,end,y-22,state.rightOrientation,9);line(ctx,[[end,y-8],[end,y+8]],barrierColor,2);ctx.fillStyle=barrierColor;ctx.textAlign='center';ctx.font='11px "Segoe UI","Microsoft YaHei",sans-serif';ctx.fillText('CTCF-L',ax,y-34);ctx.fillText('CTCF-R',end,y-34);
+dot(ctx,ax,y,5.5,fixedColor);ctx.fillStyle=fixedColor;ctx.textAlign='center';ctx.fillText('A',ax,y+31);
+dot(ctx,bx,y,9,movingColor);ctx.fillStyle='#fff';ctx.font='11px "Segoe UI",sans-serif';ctx.fillText('B',bx,y+4);ctx.font='11px "Segoe UI","Microsoft YaHei",sans-serif';
+ctx.fillStyle='#657680';for(const p of (w<380?[0,20,60,100]:[0,20,40,60,80,100])){ctx.textAlign=p===0?'left':p===N?'right':'center';ctx.fillText(p*BIN+' kb',x(p),98);}
+}
+function addKernel(values,i,j,amount){for(let di=-1;di<=1;di++)for(let dj=-1;dj<=1;dj++){const row=i+di,col=j+dj;if(row<0||row>=N||col<0||col>=N)continue;const weight=Math.exp(-(di*di+dj*dj)/.9);values[row*N+col]+=amount*weight;}}
+function contactMatrix(){const values=new Float64Array(N*N);for(let i=0;i<N;i++)for(let j=0;j<N;j++)values[i*N+j]=8/Math.pow(1+Math.abs(i-j),.85);
+if(state.accumulate){const full=Math.floor(state.b);for(let k=A+1;k<=full;k++){addKernel(values,A,k,6);addKernel(values,k,A,6);}if(state.b>full){addKernel(values,A,full+1,6*(state.b-full));addKernel(values,full+1,A,6*(state.b-full));}
+if(atBarrier()){const extra=44*state.dwell/HOLD;addKernel(values,A,STOP,extra);addKernel(values,STOP,A,extra);}}
+else{const b=Math.round(state.b);addKernel(values,A,b,23);addKernel(values,b,A,23);}
+return values;}
+function rgb(value){const t=Math.min(1,Math.sqrt(Math.max(0,value)/52))*(palette.length-1),index=Math.min(palette.length-2,Math.floor(t)),u=t-index;return palette[index].map((v,k)=>Math.round(v*(1-u)+palette[index+1][k]*u));}
+function drawMatrix(){const canvas=$('matrix'),{ctx,w,h}=context(canvas),l=48,t=13,size=Math.min(w-l-13,h-t-38),values=contactMatrix();matrixValues=values;const scratch=document.createElement('canvas');scratch.width=N;scratch.height=N;const sctx=scratch.getContext('2d'),pixels=sctx.createImageData(N,N);for(let i=0;i<N*N;i++){const c=rgb(values[i]);pixels.data[i*4]=c[0];pixels.data[i*4+1]=c[1];pixels.data[i*4+2]=c[2];pixels.data[i*4+3]=255;}sctx.putImageData(pixels,0,0);ctx.imageSmoothingEnabled=false;ctx.drawImage(scratch,l,t,size,size);ctx.strokeStyle='#d1dadd';ctx.lineWidth=.7;ctx.strokeRect(l,t,size,size);
+ctx.fillStyle='#657680';for(let k=0;k<=5;k++){const f=k/5,label=String(k*200);ctx.textAlign=k===0?'left':k===5?'right':'center';ctx.fillText(label,l+f*size,t+size+18);ctx.textAlign='right';ctx.fillText(label,l-7,t+f*size+4);}ctx.textAlign='center';ctx.fillText('基因组位置 (kb)',l+size/2,t+size+35);ctx.save();ctx.translate(11,t+size/2);ctx.rotate(-Math.PI/2);ctx.fillText('基因组位置 (kb)',0,0);ctx.restore();
+// Blue outlines identify the instantaneous contact; they are not counts.
+const x1=l+(state.b+.5)/N*size,y1=t+(A+.5)/N*size,x2=l+(A+.5)/N*size,y2=t+(state.b+.5)/N*size,r=Math.max(4,size/N*.85);ctx.strokeStyle=movingColor;ctx.lineWidth=1.4;for(const [x,y] of [[x1,y1],[x2,y2]]){ctx.beginPath();ctx.arc(x,y,r+2,0,2*Math.PI);ctx.stroke();}
+canvas._plot={l,t,size,w,h};
+// Label the upper-triangle feature only; the other is its symmetric copy.
+if(state.accumulate&&state.b>A+10){ctx.fillStyle='#27343c';ctx.textAlign='left';const sx=l+(A+5)/N*size,sy=t+(A-3)/N*size;ctx.fillText('stripe：A 与连续位置接触',sx,sy);}
+if(state.accumulate&&state.dwell>.45){ctx.fillStyle='#27343c';ctx.textAlign='right';ctx.fillText('dot',Math.min(l+size-3,x1+3),y1-13);}
+}
+function drawProfile(){const {ctx,w,h}=context($('profile'),87),l=48,r=w-13,top=19,bottom=63,x=k=>l+(k+.5)/N*(r-l),y=v=>bottom-Math.min(1,v/55)*(bottom-top);ctx.fillStyle='#657680';ctx.textAlign='left';ctx.fillText(blocking()?'锚点 A 的接触谱：stripe → 停留峰值':'锚点 A 的接触谱：越过 800 kb 后继续延伸',l,12);line(ctx,[[l,bottom],[r,bottom]],'#d4dfe0',1);ctx.strokeStyle='#b13639';ctx.lineWidth=1.5;ctx.beginPath();for(let k=0;k<N;k++){const v=matrixValues[A*N+k];k?ctx.lineTo(x(k),y(v)):ctx.moveTo(x(k),y(v));}ctx.stroke();line(ctx,[[x(A),bottom],[x(A),top]],'#ba6638',1);ctx.fillStyle='#657680';ctx.textAlign='left';ctx.fillText('0 kb',l,h-2);ctx.textAlign='right';ctx.fillText('1000 kb',r,h-2);}
+function updateText(){
+const b=Math.round(state.b),length=(b-A)*BIN,stalled=atBarrier(),passed=!blocking()&&state.b>=STOP;
+$('position').max=limit();$('position').value=b;$('positionValue').textContent=b*BIN+' kb';$('loopValue').textContent=length+' kb';$('pairValue').textContent=`(${A*BIN}, ${b*BIN}) kb`;
+$('dwellValue').textContent='CTCF 停留：'+state.dwell.toFixed(1)+' s（演示时间）';
+$('mapView').textContent=state.accumulate?'累计接触 · Hi-C 视角':'仅当前接触 · 单一构象';
+$('play').textContent=state.playing||state.holding?'暂停':state.b>=limit()&&(!blocking()||state.dwell>=HOLD)?'重新自动演示':'自动挤出';
+$('motionStatus').textContent=stalled?'相向 CTCF · 已停靠':passed?'已越过 CTCF-R':state.playing?'B 向右前进':'拖动 B 改变进度';
+$('rightMotif').textContent=blocking()?'<':'>';$('flipCTCF').setAttribute('aria-pressed',String(!blocking()));
+$('rangeEnd').textContent=blocking()?'CTCF-R = 800 kb · 阻挡':'CTCF-R = 800 kb · 可越过';
+$('orientationStatus').textContent=blocking()?'相向排列 > … <：右端阻挡，停留后形成 dot。':'同向排列 > … >：越过右端，stripe 延伸；本模型不在 800 kb 增加停留 dot。';
+const phase=stalled?'dot':passed?'bypass':state.b>=A+12?'stripe':'loop';
+$('stageLoop').classList.toggle('active',phase==='loop');$('stageStripe').classList.toggle('active',phase==='stripe'||phase==='bypass');$('stageDot').classList.toggle('active',phase==='dot');
+$('stageDot').textContent=blocking()?'③ 末端停留形成 dot':'③ 越过 CTCF，stripe 继续';
+if(phase!==lastPhase||phase==='dot'||phase==='bypass'){
+lastPhase=phase;let title,body;
+if(!state.accumulate){title='当前构象：一对接触坐标';body='这里只显示现在的 A–B 接触，不叠加沿途状态，因此不会形成累计 stripe。重新勾选累计接触进行比较。';}
+else if(phase==='loop'){title='固定 A，移动 B：Loop 扩大';body='左端 CTCF-L 已锚定；cohesin 从 B 侧继续送入 DNA。绿色箭头表示 motif 朝向，不是运动方向。';}
+else if(phase==='stripe'){title='A 不变，B 连续变化：Stripe 延长';body='不同状态中，A 依次接触一段连续区域。将这些接触累计，固定行与固定列形成对称的 stripe。';}
+else if(phase==='bypass'){title=state.b>=END?'到达演示边界：无新增停留 dot':'CTCF-R 朝向翻转：移动端继续前进';body='本模型允许越过同向 CTCF；stripe 延伸至 800 kb 以外。CTCF-R 随其结合的 DNA 进入 loop。950 kb 仅是演示范围边界，不是另一处生物屏障。';}
+else if(state.dwell<HOLD){title='相向 CTCF > … <：B 在 800 kb 停留';body='CTCF-R 阻挡移动端，同一对坐标继续积累接触，dot 逐渐比沿途的 stripe 更强。翻转右端朝向可对比越过的情况。';}
+else{title='相向 CTCF：Stripe + 末端 Dot';body='Stripe 表示 A 与连续区域的接触富集；800 kb 的 dot 表示停留使该接触对更常出现。真实 CTCF 是具有方向偏好的概率性屏障。';}
+$('phaseTitle').textContent=title;$('phaseBody').textContent=body;
+}
+window.loopDemoState={b:state.b,dwell:state.dwell,playing:state.playing,holding:state.holding,accumulate:state.accumulate,phase,rightOrientation:state.rightOrientation,blocking:blocking(),limit:limit(),stripeValue:matrixValues[A*N+40],dotValue:matrixValues[A*N+STOP],beyondValue:matrixValues[A*N+90]};}
+function render(){try{drawChromatin();drawGenome();drawMatrix();drawProfile();updateText();}catch(e){$('error').textContent='演示绘制失败：'+e.message;console.error(e);}}
+function requestTick(){if(!raf){last=performance.now();raf=requestAnimationFrame(tick);}}
+function tick(now){const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;raf=0;if(state.playing){state.b=Math.min(limit(),state.b+SPEED*dt);if(state.b>=limit()){state.playing=false;state.holding=atBarrier();}}if(state.holding){state.dwell=Math.min(HOLD,state.dwell+dt);if(state.dwell>=HOLD)state.holding=false;}render();if(state.playing||state.holding)raf=requestAnimationFrame(tick);}
+function selectProgress(value){state.playing=false;state.b=Math.max(A+1,Math.min(limit(),Number(value)));state.dwell=0;state.holding=atBarrier();lastPhase='';render();if(state.holding)requestTick();}
+function reset(){if(raf)cancelAnimationFrame(raf);raf=0;state.b=A+1;state.dwell=0;state.playing=false;state.holding=false;lastPhase='';render();}
+$('flipCTCF').addEventListener('click',()=>{state.rightOrientation*=-1;reset();});
+$('position').addEventListener('input',e=>selectProgress(e.target.value));$('accumulate').addEventListener('change',e=>{state.accumulate=e.target.checked;lastPhase='';render();});$('reset').addEventListener('click',reset);$('play').addEventListener('click',()=>{if(state.playing||state.holding){state.playing=false;state.holding=false;if(raf)cancelAnimationFrame(raf);raf=0;render();return;}if(state.b>=limit()&&(!blocking()||state.dwell>=HOLD))reset();if(atBarrier())state.holding=true;else state.playing=true;render();requestTick();});
+function progressAt(event){const canvas=$('genome'),s=canvas._scale,rect=canvas.getBoundingClientRect(),x=(event.clientX-rect.left)/rect.width*s.w;return Math.round((x-s.l)/(s.r-s.l)*N);}
+$('genome').addEventListener('pointerdown',e=>{dragging=true;$('genome').setPointerCapture(e.pointerId);selectProgress(progressAt(e));});$('genome').addEventListener('pointermove',e=>{if(dragging)selectProgress(progressAt(e));});function release(){dragging=false;}$('genome').addEventListener('pointerup',release);$('genome').addEventListener('pointercancel',release);
+$('export').addEventListener('click',()=>{const out=document.createElement('canvas');out.width=1700;out.height=1080;const ctx=out.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,out.width,out.height);ctx.fillStyle='#27343c';ctx.font='29px "Microsoft YaHei",sans-serif';ctx.fillText('单向环挤出 · Loop → Stripe → Dot',35,45);ctx.font='18px "Microsoft YaHei",sans-serif';ctx.fillText(`A = 200 kb · B = ${Math.round(state.b)*BIN} kb · ${state.accumulate?'累计接触':'当前构象'} · 末端停留 ${state.dwell.toFixed(1)} s`,35,79);ctx.drawImage($('chromatin'),20,110,750,430);ctx.drawImage($('genome'),20,550,750,150);ctx.drawImage($('matrix'),800,105,875,825);ctx.drawImage($('profile'),800,935,875,95);ctx.font='20px "Microsoft YaHei",sans-serif';ctx.fillText($('phaseTitle').textContent,40,760);ctx.font='16px "Microsoft YaHei",sans-serif';const body=$('phaseBody').textContent;let line='',y=802;for(const ch of body){if(ctx.measureText(line+ch).width>700){ctx.fillText(line,40,y);line=ch;y+=29;}else line+=ch;}if(line)ctx.fillText(line,40,y);ctx.font='14px "Microsoft YaHei",sans-serif';ctx.fillText('机制教学示意；接触强度与时间没有物理标定，不是真实 Hi-C 数据。上下两个信号代表同一对接触。',35,1055);const a=document.createElement('a');a.download=`Loop_Extrusion_B${Math.round(state.b)*BIN}kb.png`;a.href=out.toDataURL('image/png');a.click();});
+let resizeTimer;new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(render,60);}).observe(document.querySelector('.workspace'));render();
+})();
+</script></body></html>
