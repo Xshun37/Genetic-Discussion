@@ -5,49 +5,194 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>染色质三维结构 · 交互演示</title>
 <style>
-:root{color-scheme:light;--bg:#f4f2ec;--paper:#fff;--ink:#27343a;--muted:#65737b;--line:#d9dedd;--accent:#a43e31}
+:root{
+  color-scheme:light;
+  --paper:#fbfbf8;
+  --ink:#12171a;
+  --rule:#d9dcd4;
+  --muted:#5a666b;
+  --signal:#a63a22;
+  --band-dark:#5f7681;
+  --band-mid:#9fb2b8;
+  --band-light:#d7dfdc;
+  --serif:"Source Han Serif SC","Noto Serif SC","Songti SC","SimSun",serif;
+  --sans:"Source Han Sans SC","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:"JetBrains Mono","SFMono-Regular",Consolas,"Courier New",monospace;
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
-main{max-width:960px;margin:0 auto;padding:64px 24px 72px}
-h1{font-size:clamp(26px,4vw,38px);line-height:1.3;margin:0 0 10px;font-weight:650;letter-spacing:-.01em}
-.lead{color:var(--muted);margin:0 0 40px;max-width:62ch}
-.cards{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
-a.card{display:flex;flex-direction:column;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:26px 24px;text-decoration:none;color:inherit;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
-a.card:hover,a.card:focus-visible{transform:translateY(-2px);border-color:#b9c4c7;box-shadow:0 8px 24px rgba(39,52,58,.10)}
-a.card:focus-visible{outline:3px solid #7b9dbc;outline-offset:3px}
-.tag{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700}
-.card h2{font-size:19px;margin:0;font-weight:650}
-.card p{margin:0;color:var(--muted);font-size:14.5px}
-.go{margin-top:6px;font-size:14px;font-weight:600;color:#315d8a}
-footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
-footer a{color:#315d8a}
-@media(max-width:480px){main{padding:44px 18px 56px}}
+html{overflow-x:clip}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font:16px/1.75 var(--sans);
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1040px;margin:0 auto;padding:0 32px}
+
+/* 图版带：chr21 染色体模式图 */
+.band{
+  width:100vw;margin-left:calc(50% - 50vw);
+  border-bottom:1px solid var(--rule);
+  padding:34px 0 22px;
+  background:var(--paper);
+}
+.band-inner{max-width:1040px;margin:0 auto;padding:0 32px}
+.ideo-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:12px}
+.ideo-head span{font:11.5px/1.4 var(--mono);color:var(--muted);letter-spacing:.03em}
+
+.chrom{position:relative;display:flex;align-items:stretch;height:26px;width:100%;margin-bottom:38px}
+.arm{display:flex;min-width:0;overflow:hidden}
+.arm-p{flex:0 1 24.6%;border-radius:13px 0 0 13px}
+.arm-q{flex:1 1 71.8%;border-radius:0 13px 13px 0}
+.cen{flex:0 0 3.6%;position:relative;background:var(--band-light)}
+.cen::before{content:"";position:absolute;left:50%;top:0;width:1px;height:100%;background:var(--band-mid)}
+.seg{flex:1 1 auto}
+.light{background:var(--band-light)}
+.mid{background:var(--band-mid)}
+.dark{background:var(--band-dark)}
+
+/* 分析窗口标记 */
+.window{
+  position:absolute;left:32.1%;right:0;top:calc(100% + 5px);height:16px;
+  border-top:2px solid var(--signal);
+}
+.window::before,.window::after{
+  content:"";position:absolute;top:-2px;width:2px;height:16px;background:var(--signal);
+}
+.window::before{left:0}
+.window::after{right:0}
+.window-label{
+  position:absolute;right:0;top:17px;
+  font:10.5px/1.4 var(--mono);color:var(--signal);letter-spacing:.02em;white-space:nowrap;
+}
+
+/* 标题区 */
+header{padding:42px 0 30px;border-bottom:1px solid var(--rule)}
+.masthead{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap}
+h1{
+  font-family:var(--serif);font-weight:600;letter-spacing:-.012em;
+  font-size:clamp(30px,4.6vw,46px);line-height:1.18;margin:0;
+}
+h1 small{
+  display:block;font-size:clamp(15px,1.8vw,18px);font-weight:400;color:var(--muted);
+  letter-spacing:0;margin-top:10px;font-family:var(--sans);
+}
+.spec{font:12px/1.9 var(--mono);color:var(--muted);text-align:right;white-space:nowrap;margin:0}
+.spec b{color:var(--ink);font-weight:400}
+
+/* 标本记录 */
+.plate{margin:0;padding:0;list-style:none}
+.plate li{border-bottom:1px solid var(--rule)}
+.plate a{
+  display:grid;grid-template-columns:66px minmax(0,1fr) auto;
+  gap:0 28px;align-items:baseline;
+  padding:26px 0 24px;color:inherit;text-decoration:none;
+}
+.fig{font:12px/1.6 var(--mono);color:var(--muted);letter-spacing:.04em}
+.title{font-family:var(--serif);font-size:clamp(20px,2.4vw,24px);font-weight:600;line-height:1.35;letter-spacing:-.008em}
+.desc{margin:8px 0 0;color:var(--muted);font-size:15px;max-width:62ch}
+.meta{margin:10px 0 0;font:11.5px/1.7 var(--mono);color:var(--muted);letter-spacing:.02em}
+.meta span+span::before{content:"／";margin:0 .55em;color:var(--rule)}
+.open{
+  font:13px/1 var(--sans);font-weight:600;color:var(--ink);
+  border-bottom:1px solid var(--ink);padding-bottom:3px;
+  transition:border-color .18s ease,color .18s ease;
+}
+.plate a:hover .open,.plate a:focus-visible .open{color:var(--signal);border-color:var(--signal)}
+.plate a:focus-visible{outline:2px solid var(--ink);outline-offset:6px}
+
+/* 版权说明 */
+footer{padding:26px 0 56px;color:var(--muted);font-size:13px}
+footer p{margin:0 0 6px}
+footer .mono{font:11.5px/1.7 var(--mono);letter-spacing:.02em}
+footer a{color:var(--ink);text-underline-offset:3px;text-decoration-thickness:1px}
+
+@media (max-width:620px){
+  .wrap,.band-inner{padding:0 20px}
+  header{padding:32px 0 24px}
+  .spec{text-align:left}
+  .chrom{height:20px}
+  .band{padding:26px 0 18px}
+  .plate a{grid-template-columns:44px minmax(0,1fr);row-gap:12px;padding:22px 0}
+  .open{grid-column:2;justify-self:start}
+  .window-label{font-size:9.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
 </style>
 </head>
 <body>
-<main>
-  <h1>染色质三维结构 · 交互演示</h1>
-  <p class="lead">Topic 4 Genome 课堂演示。两个页面都是单文件 HTML，Canvas 实时绘制，不依赖网络库，可直接在浏览器打开。</p>
 
-  <div class="cards">
-    <a class="card" href="HiC_Demo.html">
-      <span class="tag">01 · Hi-C</span>
-      <h2>一张图逐级放大</h2>
-      <p>GM12878 · chr21 · hg38。从 31 Mb 的 A/B compartment，到 6 Mb 的 TAD，再到 2 Mb 内的局部 loop 候选；可调 bin、reads 深度与归一化方式，并导出 PNG。</p>
-      <span class="go">打开演示 →</span>
-    </a>
-    <a class="card" href="Loop_Extrusion.html">
-      <span class="tag">02 · Loop Extrusion</span>
-      <h2>环挤压模型</h2>
-      <p>黏连蛋白沿染色质挤出环，CTCF 位点定向阻断。可调挤出速度、CTCF 占位与朝向，观察接触图谱如何从均匀背景中长出条纹与角点。</p>
-      <span class="go">打开演示 →</span>
-    </a>
+<figure class="band">
+  <div class="band-inner">
+    <div class="ideo-head">
+      <span>chr21</span>
+      <span>46.7 Mb　hg38　模式图，非等比</span>
+    </div>
+    <div class="chrom" role="img" aria-label="21 号染色体模式图，红色标记为演示覆盖的 15 至 46.7 Mb 区域">
+      <div class="arm arm-p">
+        <div class="seg light" style="flex-grow:5"></div>
+        <div class="seg mid" style="flex-grow:3"></div>
+        <div class="seg light" style="flex-grow:4"></div>
+      </div>
+      <div class="cen"></div>
+      <div class="arm arm-q">
+        <div class="seg light" style="flex-grow:1.7"></div>
+        <div class="seg dark" style="flex-grow:2.6"></div>
+        <div class="seg light" style="flex-grow:1.8"></div>
+        <div class="seg dark" style="flex-grow:3.0"></div>
+        <div class="seg mid" style="flex-grow:2.2"></div>
+        <div class="seg light" style="flex-grow:2.0"></div>
+        <div class="seg dark" style="flex-grow:2.0"></div>
+        <div class="seg light" style="flex-grow:2.2"></div>
+        <div class="seg dark" style="flex-grow:2.6"></div>
+        <div class="seg mid" style="flex-grow:2.2"></div>
+        <div class="seg light" style="flex-grow:2.2"></div>
+        <div class="seg dark" style="flex-grow:2.6"></div>
+        <div class="seg light" style="flex-grow:2.2"></div>
+        <div class="seg mid" style="flex-grow:2.0"></div>
+        <div class="seg dark" style="flex-grow:2.1"></div>
+      </div>
+      <div class="window"><span class="window-label">分析窗口 15.0 – 46.7 Mb</span></div>
+    </div>
   </div>
+</figure>
+
+<div class="wrap">
+  <header>
+    <div class="masthead">
+      <h1>染色质三维结构<small>两个交互演示，单文件 Canvas，无需联网</small></h1>
+      <p class="spec"><b>GM12878</b><br>chr21　hg38</p>
+    </div>
+  </header>
+
+  <ol class="plate">
+    <li><a href="HiC_Demo.html">
+      <span class="fig">图 1</span>
+      <span>
+        <span class="title">一张图逐级放大</span>
+        <p class="desc">同一张 Hi-C 接触矩阵：31 Mb 的区室格局，收拢到 6 Mb 的 TAD，再进入 2 Mb 内的局部环。bin 与测序深度可独立调整。</p>
+        <p class="meta"><span>38 MB</span><span>Canvas</span><span>可导出 PNG</span></p>
+      </span>
+      <span class="open">打开演示</span>
+    </a></li>
+    <li><a href="Loop_Extrusion.html">
+      <span class="fig">图 2</span>
+      <span>
+        <span class="title">环挤压模型</span>
+        <p class="desc">黏连蛋白沿染色质挤出成环，CTCF 位点定向阻断。可调挤出速度与位点朝向，看条纹与角点如何从均匀背景里长出来。</p>
+        <p class="meta"><span>29 KB</span><span>Canvas</span><span>可调参数</span></p>
+      </span>
+      <span class="open">打开演示</span>
+    </a></li>
+  </ol>
 
   <footer>
-    Hi-C 数据：<a href="https://www.encodeproject.org/experiments/ENCSR822UMS/" target="_blank" rel="noreferrer">ENCODE ENCSR822UMS</a>（GM12878 intact Hi-C）。页面为教学用途。<br>
-    提示：01 页面内嵌约 40 MB 数据，首次加载需要几秒；02 页面不足 30 KB。
+    <p class="mono">数据　ENCODE ENCSR822UMS · GM12878 intact Hi-C · MAPQ ≥ 30</p>
+    <p class="mono">用途　课堂演示，仅用于教学，页面不收集任何数据</p>
+    <p><a href="https://www.encodeproject.org/experiments/ENCSR822UMS/" target="_blank" rel="noreferrer">在 ENCODE 查看原始实验</a></p>
   </footer>
-</main>
+</div>
+
 </body>
 </html>
